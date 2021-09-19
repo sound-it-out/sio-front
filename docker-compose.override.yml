@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  sio.front.server:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - Identity__Authority=https://host.docker.internal:5001
+      - Api__Url=https://sio.api:44363
+    ports:
+      - "63328:80"
+      - "44348:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro

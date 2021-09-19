@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  sio.front.server:
+    image: ${DOCKER_REGISTRY-}siofrontserver
+    build:
+      context: .
+      dockerfile: src/SIO.Front.Server/Dockerfile
+
+networks:    
+  default:
+    external:
+        name: sio.network
