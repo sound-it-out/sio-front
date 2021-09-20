@@ -1,0 +1,101 @@
+$spacer: 1rem;
+$spacers:
+(
+  0: 0,
+  1: $spacer * .25,
+  2: $spacer * .5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3 ,
+);
+$sides: (top, bottom, left, right);
+
+// Margin
+@each $space, $value in $spacers {
+  .has-margin-#{$space} {
+    margin: $value !important;
+  }
+}
+
+@each $side in $sides {
+  @each $space, $value in $spacers {
+    .has-margin-#{$side}-#{$space} {
+      margin-#{$side}: $value !important;
+    }
+  }  
+}
+
+@each $side in $sides {
+  .has-margin-#{$side}-auto {
+    margin-#{$side}: auto !important;
+  }
+}
+
+// Padding
+@each $space, $value in $spacers {
+  .has-padding-#{$space} {
+    padding: $value !important;
+  }
+}
+
+@each $space, $value in $spacers {
+  .has-padding-horizontal-#{$space} {
+    padding-left: $value !important;
+    padding-right: $value !important;
+  }
+}
+
+@each $space, $value in $spacers {
+  .has-padding-vertical-#{$space} {
+    padding-top: $value !important;
+    padding-bottom: $value !important;
+  }
+}
+
+@each $side in $sides {
+  @each $space, $value in $spacers {
+    .has-padding-#{$side}-#{$space} {
+      padding-#{$side}: $value !important;
+    }
+  }  
+}
+
+@each $side in $sides {
+  .has-padding-#{$side}-auto {
+    padding-#{$side}: auto !important;
+  }
+}
+
+.has-shadow-light
+{
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+}
+
+.has-shadow-standard
+{
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.has-shadow-dark
+{
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+}
+
+.has-radius-small
+{
+  border-radius: $radius-small !important;
+}
+
+.has-radius
+{
+  border-radius: $radius !important;
+}
+
+.has-radius-large
+{
+  border-radius: $radius-large !important;
+}
+
+.has-text-grey {
+  color: $grey !important;
+}

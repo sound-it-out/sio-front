@@ -1,0 +1,30 @@
+.navbar {
+    .navbar-start {
+        flex-grow: 1;
+        justify-content: center;
+    
+        .navbar-item {
+            border-radius: 0px !important;
+            border-bottom: 3px solid white;
+            font-weight: bold;
+            color: $grey !important;
+            &.router-link-active,
+            &:hover {
+                border-color: $primary;
+                color: $primary !important;
+            }
+
+            &:hover {
+                background-color: white !important;
+            }
+        }    
+    }
+
+    .navbar-end {
+        .navbar-item {
+            i {
+                color: $grey !important;
+            }
+        }
+    }
+}

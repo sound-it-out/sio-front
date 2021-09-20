@@ -1,0 +1,9 @@
+@import "../node_modules/bulma/sass/utilities/initial-variables";
+@import "utils/_all";
+@import "sio";
+
+@import "../node_modules/bulma/bulma";
+
+html {
+    background: #f2f2f2;
+}
