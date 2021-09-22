@@ -1,34 +1,58 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">SIO.Front</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
+﻿<nav role="navigation"
+     aria-label="main navigation"
+     class="navbar has-padding-horizontal-3 has-padding-vertical-0 is-white is-spaced">
+    <div class="navbar-brand">
+        <a href="/"
+           aria-current="page"
+           class="navbar-item router-link-exact-active router-link-active">
+           <img src="/img/logo.svg" alt="Sound it out" style="min-height:4rem;">
+        </a><a role="button" aria-label="menu" class="navbar-burger burger" @onclick="ToggleNavMenu">
+            <span aria-hidden="true"></span> <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+    <div class="@NavMenuClass">
+        <div class="navbar-start">
+            <a href="/"
+               aria-current="page"
+               class="
+                      navbar-item
+                      has-padding-vertical-4 has-padding-horizontal-5
+                    ">
+                Documents
+            </a><a href="/library"
+                   class="navbar-item has-padding-vertical-4 has-padding-horizontal-5">
+                Library
+            </a><a href="/orders"
+                   class="navbar-item has-padding-vertical-4 has-padding-horizontal-5">
+                Orders
+            </a>
+        </div>
+        <div class="navbar-end">
+            <div class="@UserDropdownClass" @onclick="ToggleUserDropdown">
+                <a role="menuitem" aria-haspopup="true" href="#" class="navbar-link">
+                    <i class="fas fa-user-circle fa-2x text-white"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    <LoginDisplay />
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </li>
-    </ul>
-</div>
 
 @code {
+    private bool collapseUserDropdown = true;
     private bool collapseNavMenu = true;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string UserDropdownClass => collapseUserDropdown ? "navbar-item has-dropdown" : "navbar-item has-dropdown is-active";
+    private string NavMenuClass => collapseNavMenu ? "navbar-menu" : "navbar-menu is-active";
+
+    private void ToggleUserDropdown()
+    {
+        collapseUserDropdown = !collapseUserDropdown;
+    }
 
     private void ToggleNavMenu()
     {
