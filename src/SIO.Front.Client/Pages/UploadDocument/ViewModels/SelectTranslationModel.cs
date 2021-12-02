@@ -13,8 +13,8 @@ namespace SIO.Front.Client.Pages.UploadDocument.ViewModels
         public TranslationOptionViewModel[] AvaliableTranslationOptions { get; set; }
 
         public string SearchKeyword { get; set; }
-        public TranslationType? SelectedSearchTranslationType { get; set; }
 
         public TranslationType? SelectedTranslationType => AvaliableTranslationOptions.FirstOrDefault(o => o.Selected)?.TranslationType;
+        public bool HasSelection => AvaliableTranslationOptions.Any(o => o.Selected);
     }
 }

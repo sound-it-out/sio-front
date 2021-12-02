@@ -10,18 +10,9 @@
         <div class="columns">
             <div class="column">
                 <EditForm Model="Model">
-                    <div class="field is-grouped">
+                    <div class="field">
                       <p class="control is-expanded">
                         <InputText @bind-Value="Model.SearchKeyword" class="input" @oninput="OnKeywordSearch"></InputText>
-                      </p>
-                      <p class="control">
-                         <InputSelect @bind-Value="Model.SelectedSearchTranslationType" class="select" placeholder="Search..." @onchange="OnSelectedTypeSearch">
-                            <option value="">Please select...</option>
-                            @foreach (TranslationType value in Enum.GetValues(typeof(TranslationType)))
-                            {
-                                <option value="@value">@TranslationOptionViewModel.GetTranslationTypeName(@value)</option>
-                            }
-                        </InputSelect>
                       </p>
                     </div>
                    
@@ -60,26 +51,14 @@
         {
             Model.AvaliableTranslationOptions = (await TranslationApiAsync.V1TranslationListoptionsGetAsync()).Select(o => new TranslationOptionViewModel(o)).ToArray();
             Model.TranslationOptions = Model.AvaliableTranslationOptions;
-        }        
-
-        Model.IsValid = true;
+        }
     }
 
     private void OnKeywordSearch(Microsoft.AspNetCore.Components.ChangeEventArgs args) => OnSearch(args?.Value?.ToString(), Model.SelectedSearchTranslationType);
-    private void OnSelectedTypeSearch(Microsoft.AspNetCore.Components.ChangeEventArgs args)
-    {
-        Console.WriteLine(args?.Value?.ToString());
-
-        if (int.TryParse(args?.Value?.ToString(), out var value))
-            OnSearch(Model.SearchKeyword, (TranslationType)value);
-    }
 
     private void OnSearch(string keyword, TranslationType? translationType) 
     {
         Model.TranslationOptions = Model.AvaliableTranslationOptions;
-
-        if(translationType.HasValue)
-            Model.TranslationOptions = Model.TranslationOptions.Where(o => o.TranslationType == translationType);
 
         if(!string.IsNullOrWhiteSpace(keyword))
             Model.TranslationOptions = Model.TranslationOptions.Where(o => o.Subject.Contains(keyword, StringComparison.OrdinalIgnoreCase));
@@ -88,8 +67,13 @@
     private void SelectOption(TranslationOptionViewModel o)
     {
         for (var i = 0; i < Model.AvaliableTranslationOptions.Count(); i++)
-            Model.AvaliableTranslationOptions[i].Selected = Model.AvaliableTranslationOptions[i].Subject == o.Subject && Model.AvaliableTranslationOptions[i].TranslationType == o.TranslationType;
+            if(Model.AvaliableTranslationOptions[i].Subject == o.Subject && Model.AvaliableTranslationOptions[i].TranslationType == o.TranslationType)
+                Model.AvaliableTranslationOptions[i].Selected = !Model.AvaliableTranslationOptions[i].Selected;
+            else
+                Model.AvaliableTranslationOptions[i].Selected = false;
 
+
+        Model.IsValid = Model.HasSelection;
         OnSearch(Model.SearchKeyword, Model.SelectedSearchTranslationType);
     }
 

@@ -80,8 +80,11 @@
     /// </summary>
     protected internal async Task GoNextAsync()
     {
+        if (ActiveStep != null && !ActiveStep.Model.IsValid)
+            return;
+
         if(ActiveStep != null)
-            await ActiveStep.SubmitAsync();
+            await ActiveStep.SubmitAsync();        
 
         if (ActiveStepIx < _steps.Count - 1)
             await SetActiveAsync(_steps[(_steps.IndexOf(ActiveStep) + 1)]);
@@ -96,9 +99,6 @@
     {
         if (step == null)
             throw new ArgumentNullException(nameof(step));
-
-        if (ActiveStep != null && !ActiveStep.Model.IsValid)
-            return;
 
         ActiveStep = step;
 
