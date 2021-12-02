@@ -1,0 +1,56 @@
+﻿@if (Loading)
+{
+    <Loader />
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    private bool Loading { get; set; }
+
+    [Parameter]
+    public Func<Task> OnPageLoadAsync { get; set; }
+    [Parameter]
+    public Action OnPageLoad { get; set; }
+    [Parameter]
+    public Func<Task> OnRefreshAsync { get; set; }
+    [Parameter]
+    public Action OnRefresh { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public void Refresh()
+    {
+        Loading = true;
+        OnRefresh?.Invoke();
+        Loading = false;
+    }
+
+    public async Task RefreshAsync()
+    {
+        Loading = true;
+        if(OnRefreshAsync != null)
+            await OnRefreshAsync();
+        Loading = false;
+    }
+
+    sealed protected override async Task OnInitializedAsync()
+    {
+        Loading = true;
+        if(OnPageLoadAsync != null)
+            await OnPageLoadAsync();
+        Loading = false;
+    }
+
+    sealed protected override void OnInitialized()
+    {
+        Loading = true;
+        OnPageLoad?.Invoke();
+        Loading = false;
+    }
+
+    public void ToggleLoading(bool? isLoading) => Loading = isLoading ?? !Loading;
+}

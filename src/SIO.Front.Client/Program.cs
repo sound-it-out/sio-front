@@ -13,6 +13,7 @@ namespace SIO.Front.Client
             builder.RootComponents.Add<App>("#app");
 
             builder.Services
+                .AddComponents()
                 .AddApi(builder.Configuration)
                 .AddAuthentication(builder.Configuration)
                 .AddApiAuthorization();

@@ -1,0 +1,59 @@
+﻿@using SIO.Api.Client.Client
+@using SIO.Front.Client.Pages.UploadDocument.ViewModels
+@inject IWizardInteraction WizardState
+
+<WizardStep OnSubmitAsync="SubmitAsync" Model="Model">
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">File</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <div class="control">
+            <div class="file has-name">
+              <label class="file-label">
+                  <InputFile class="file-input" OnChange="@LoadFile" />
+                <span class="file-cta">
+                  <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                  </span>
+                  <span class="file-label">
+                    Choose a file…
+                  </span>
+                </span>
+                <span class="file-name">
+                    @Model?.File?.Name
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</WizardStep>
+
+@code {
+    [Parameter]
+    public Func<UploadFileModel, Task> OnCompletionAsync { get; set; }
+    public UploadFileModel Model { get; set; }
+    
+
+    private void LoadFile(InputFileChangeEventArgs e)
+    {
+        Model.File = new(e.File.Name, e.File.OpenReadStream());
+
+        if (Model.File != null)
+            Model.IsValid = true;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (OnCompletionAsync != null)
+            await OnCompletionAsync(Model);
+    }
+
+    protected override void OnInitialized()
+    {
+        Model ??= new UploadFileModel();
+    }
+}

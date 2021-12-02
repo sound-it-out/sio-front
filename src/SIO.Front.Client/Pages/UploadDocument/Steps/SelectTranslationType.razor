@@ -1,0 +1,106 @@
+﻿@using Newtonsoft.Json
+@using SIO.Api.Client.Client
+@using SIO.Api.Client.Model
+@using SIO.Front.Client.Pages.UploadDocument.ViewModels
+@inject ITranslationApiAsync TranslationApiAsync
+
+<WizardStep OnActivationAsync="GetTranslationsAsync" OnSubmitAsync="SubmitAsync" Model="Model">
+    @if(Model.TranslationOptions != null)
+    {
+        <div class="columns">
+            <div class="column">
+                <EditForm Model="Model">
+                    <div class="field is-grouped">
+                      <p class="control is-expanded">
+                        <InputText @bind-Value="Model.SearchKeyword" class="input" @oninput="OnKeywordSearch"></InputText>
+                      </p>
+                      <p class="control">
+                         <InputSelect @bind-Value="Model.SelectedSearchTranslationType" class="select" placeholder="Search..." @onchange="OnSelectedTypeSearch">
+                            <option value="">Please select...</option>
+                            @foreach (TranslationType value in Enum.GetValues(typeof(TranslationType)))
+                            {
+                                <option value="@value">@TranslationOptionViewModel.GetTranslationTypeName(@value)</option>
+                            }
+                        </InputSelect>
+                      </p>
+                    </div>
+                   
+                </EditForm>
+            </div>
+        </div>
+        <div class="columns is-multiline translation-options">
+            @foreach(var option in Model.TranslationOptions)
+            {
+                <div class="column is-one-third">
+                    <div class="card @(option.Selected ? "has-background-primary" : "")" @onclick="() => SelectOption(option)">
+                      <div class="card-content">
+                        <div class="media">
+                          <div class="media-left">
+                          </div>
+                          <div class="media-content">
+                            <p class="title is-4 @(option.Selected ? "has-text-white" : "")">@option.Subject</p>
+                            <p class="subtitle is-6 @(option.Selected ? "has-text-white" : "")">@option.TranslationTypeName</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            }   
+        </div>        
+    }    
+</WizardStep>
+
+@code {
+    [Parameter]
+    public Func<SelectTranslationModel, Task> OnCompletionAsync { get; set; }
+    public SelectTranslationModel Model { get; set; }
+    private async Task GetTranslationsAsync()
+    {
+        if(Model.AvaliableTranslationOptions == null)
+        {
+            Model.AvaliableTranslationOptions = (await TranslationApiAsync.V1TranslationListoptionsGetAsync()).Select(o => new TranslationOptionViewModel(o)).ToArray();
+            Model.TranslationOptions = Model.AvaliableTranslationOptions;
+        }        
+
+        Model.IsValid = true;
+    }
+
+    private void OnKeywordSearch(Microsoft.AspNetCore.Components.ChangeEventArgs args) => OnSearch(args?.Value?.ToString(), Model.SelectedSearchTranslationType);
+    private void OnSelectedTypeSearch(Microsoft.AspNetCore.Components.ChangeEventArgs args)
+    {
+        Console.WriteLine(args?.Value?.ToString());
+
+        if (int.TryParse(args?.Value?.ToString(), out var value))
+            OnSearch(Model.SearchKeyword, (TranslationType)value);
+    }
+
+    private void OnSearch(string keyword, TranslationType? translationType) 
+    {
+        Model.TranslationOptions = Model.AvaliableTranslationOptions;
+
+        if(translationType.HasValue)
+            Model.TranslationOptions = Model.TranslationOptions.Where(o => o.TranslationType == translationType);
+
+        if(!string.IsNullOrWhiteSpace(keyword))
+            Model.TranslationOptions = Model.TranslationOptions.Where(o => o.Subject.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+    } 
+
+    private void SelectOption(TranslationOptionViewModel o)
+    {
+        for (var i = 0; i < Model.AvaliableTranslationOptions.Count(); i++)
+            Model.AvaliableTranslationOptions[i].Selected = Model.AvaliableTranslationOptions[i].Subject == o.Subject && Model.AvaliableTranslationOptions[i].TranslationType == o.TranslationType;
+
+        OnSearch(Model.SearchKeyword, Model.SelectedSearchTranslationType);
+    }
+
+    protected override void OnInitialized()
+    {
+        Model ??= new SelectTranslationModel();
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (OnCompletionAsync != null)
+            await OnCompletionAsync(Model);
+    }
+}

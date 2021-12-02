@@ -31,14 +31,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="SIO.Api.Client">
-      <HintPath>..\..\..\..\..\Downloads\test\v2\SIO.Api.Client.Sdk\src\SIO.Api.Client\bin\Debug\net5.0\SIO.Api.Client.dll</HintPath>
-    </Reference>
+    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\scss\components\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\css\" />
-    <Folder Include="wwwroot\scss\components\" />
+    <Reference Include="SIO.Api.Client">
+      <HintPath>..\..\..\sio-api-client\src\SIO.Api.Client\bin\Debug\net5.0\SIO.Api.Client.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

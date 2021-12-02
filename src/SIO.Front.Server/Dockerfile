@@ -8,7 +8,6 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["src/SIO.Front.Server/SIO.Front.Server.csproj", "src/SIO.Front.Server/"]
-COPY ["src/SIO.Front.Shared/SIO.Front.Shared.csproj", "src/SIO.Front.Shared/"]
 COPY ["src/SIO.Front.Client/SIO.Front.Client.csproj", "src/SIO.Front.Client/"]
 RUN dotnet restore "src/SIO.Front.Server/SIO.Front.Server.csproj"
 COPY . .

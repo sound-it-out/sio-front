@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SIO.Api.Client.Api;
+using SIO.Front.Client.Components;
 using System.Net.Http;
 
 namespace SIO.Front.Client.Extensions
@@ -13,9 +14,8 @@ namespace SIO.Front.Client.Extensions
         public static IServiceCollection AddApi(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IDocumentApiAsync>(sp => new DocumentApi(sp.GetService<IHttpClientFactory>().CreateClient(ApiClient), "https://localhost:44363", null));
-            services.AddScoped<IDocumentAuditProjectionApiAsync>(sp => new DocumentAuditProjectionApi(sp.GetService<IHttpClientFactory>().CreateClient(ApiClient), "https://localhost:44363", null));
-            services.AddScoped<IDocumentProjectionApiAsync>(sp => new DocumentProjectionApi(sp.GetService<IHttpClientFactory>().CreateClient(ApiClient), "https://localhost:44363", null));
             services.AddScoped<IUserDocumentsProjectionApiAsync>(sp => new UserDocumentsProjectionApi(sp.GetService<IHttpClientFactory>().CreateClient(ApiClient), "https://localhost:44363", null));
+            services.AddScoped<ITranslationApiAsync>(sp => new TranslationApi(sp.GetService<IHttpClientFactory>().CreateClient(ApiClient), "https://localhost:44363", null));
 
             services.AddHttpClient(ApiClient)
                 .AddHttpMessageHandler(sp =>
@@ -38,6 +38,12 @@ namespace SIO.Front.Client.Extensions
                 options.UserOptions.RoleClaim = "role";
             });
 
+            return services;
+        }
+
+        public static IServiceCollection AddComponents(this IServiceCollection services)
+        {
+            services.AddScoped<IWizardInteraction, WizardInteraction>();
             return services;
         }
     }

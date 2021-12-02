@@ -1,0 +1,25 @@
+﻿@using SIO.Front.Client.Pages.UploadDocument.Steps;
+@using SIO.Front.Client.Pages.UploadDocument.ViewModels
+@inject SIO.Api.Client.Api.IDocumentApiAsync DocumentApiAsync;
+
+<Wizard>
+    <UploadFile OnCompletionAsync="UpdateUploadFileModelAsync"></UploadFile>
+    <SelectTranslationType OnCompletionAsync="UpdateSelectTranslationModelAsync"></SelectTranslationType>
+</Wizard>
+
+@code {
+    private UploadFileModel _uploadFileModel;
+    private SelectTranslationModel _selectTranslationModel;
+
+    private Task UpdateUploadFileModelAsync(UploadFileModel model)
+    {
+        _uploadFileModel = model;
+        return Task.CompletedTask;
+    }
+
+    private async Task UpdateSelectTranslationModelAsync(SelectTranslationModel model)
+    {
+        _selectTranslationModel = model;
+        await DocumentApiAsync.V1DocumentUploadPostAsync(_uploadFileModel.File, _selectTranslationModel.SelectedTranslationType);
+    }
+}
