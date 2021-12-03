@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SIO.Api.Client.Model;
+using SIO.Domain.TranslationOptions.Api.Responses;
 using SIO.Front.Client.Components;
 
 namespace SIO.Front.Client.Pages.UploadDocument.ViewModels
@@ -14,7 +14,7 @@ namespace SIO.Front.Client.Pages.UploadDocument.ViewModels
 
         public string SearchKeyword { get; set; }
 
-        public TranslationType? SelectedTranslationType => AvaliableTranslationOptions.FirstOrDefault(o => o.Selected)?.TranslationType;
+        public TranslationOptionResponse SelectedTranslation => AvaliableTranslationOptions.FirstOrDefault(o => o.Selected);
         public bool HasSelection => AvaliableTranslationOptions.Any(o => o.Selected);
     }
 }

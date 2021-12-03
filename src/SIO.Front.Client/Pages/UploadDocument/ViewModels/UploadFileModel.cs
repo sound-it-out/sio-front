@@ -1,4 +1,4 @@
-﻿using SIO.Api.Client.Client;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using SIO.Front.Client.Components;
 
 namespace SIO.Front.Client.Pages.UploadDocument.ViewModels
@@ -7,6 +7,8 @@ namespace SIO.Front.Client.Pages.UploadDocument.ViewModels
     {
         public UploadFileModel() : base("Upload file", "fa-file-upload") { }
 
-        public FileParameter File { get; set; }
+        public byte[] File { get; set; }
+        public string FileName { get; set; }
+        public string FileContentType { get; set; }
     }
 }

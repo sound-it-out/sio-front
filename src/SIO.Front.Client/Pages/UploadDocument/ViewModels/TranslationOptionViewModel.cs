@@ -1,19 +1,11 @@
-﻿using System;
-using SIO.Api.Client.Model;
+﻿using SIO.Domain.TranslationOptions.Api.Responses;
 
 namespace SIO.Front.Client.Pages.UploadDocument.ViewModels
 {
-    public class TranslationOptionViewModel
+    public class TranslationOptionViewModel : TranslationOptionResponse
     {
-        public readonly Guid Id;
-        public readonly string Subject;
-        public readonly TranslationType? TranslationType;
-
-        public TranslationOptionViewModel(TranslationOption option)
+        public TranslationOptionViewModel(TranslationOptionResponse option) : base(option.Id, option.Subject, option.TranslationType)
         {
-            Id = Guid.NewGuid();
-            Subject = option.Subject;
-            TranslationType = option.TranslationType;
         }
 
         public bool Selected { get; set; }
@@ -21,8 +13,8 @@ namespace SIO.Front.Client.Pages.UploadDocument.ViewModels
 
         public static string GetTranslationTypeName(TranslationType? translationType) => translationType switch
         {
-            SIO.Api.Client.Model.TranslationType.NUMBER_0 => "Google",
-            SIO.Api.Client.Model.TranslationType.NUMBER_1 => "AWS",
+            SIO.Domain.TranslationOptions.Api.Responses.TranslationType.Google => "Google",
+            SIO.Domain.TranslationOptions.Api.Responses.TranslationType.AWS => "AWS",
             _ => ""
         };
     }

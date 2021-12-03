@@ -1,6 +1,8 @@
-﻿@using SIO.Front.Client.Pages.UploadDocument.Steps;
+﻿@using SIO.Domain.Documents.Commands
+@using SIO.Front.Client.Pages.UploadDocument.Steps;
 @using SIO.Front.Client.Pages.UploadDocument.ViewModels
-@inject SIO.Api.Client.Api.IDocumentApiAsync DocumentApiAsync;
+@using SIO.Infrastructure.Commands
+@inject ICommandDispatcher _commandDispatcher
 
 <Wizard>
     <UploadFile OnCompletionAsync="UpdateUploadFileModelAsync"></UploadFile>
@@ -9,7 +11,6 @@
 
 @code {
     private UploadFileModel _uploadFileModel;
-    private SelectTranslationModel _selectTranslationModel;
 
     private Task UpdateUploadFileModelAsync(UploadFileModel model)
     {
@@ -19,7 +20,6 @@
 
     private async Task UpdateSelectTranslationModelAsync(SelectTranslationModel model)
     {
-        _selectTranslationModel = model;
-        await DocumentApiAsync.V1DocumentUploadPostAsync(_uploadFileModel.File, _selectTranslationModel.SelectedTranslationType);
+        await _commandDispatcher.DispatchAsync(new UploadDocumentCommand(_uploadFileModel.File, _uploadFileModel.FileName, _uploadFileModel.FileContentType, model.SelectedTranslation));
     }
 }

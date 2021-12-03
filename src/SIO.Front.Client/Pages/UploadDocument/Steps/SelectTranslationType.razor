@@ -1,8 +1,9 @@
 ﻿@using Newtonsoft.Json
-@using SIO.Api.Client.Client
-@using SIO.Api.Client.Model
+@using SIO.Domain.TranslationOptions.Api.Responses
+@using SIO.Domain.TranslationOptions.Queries
 @using SIO.Front.Client.Pages.UploadDocument.ViewModels
-@inject ITranslationApiAsync TranslationApiAsync
+@using SIO.Infrastructure.Queries
+@inject IQueryDispatcher _queryDispatcher
 
 <WizardStep OnActivationAsync="GetTranslationsAsync" OnSubmitAsync="SubmitAsync" Model="Model">
     @if(Model.TranslationOptions != null)
@@ -49,14 +50,15 @@
     {
         if(Model.AvaliableTranslationOptions == null)
         {
-            Model.AvaliableTranslationOptions = (await TranslationApiAsync.V1TranslationListoptionsGetAsync()).Select(o => new TranslationOptionViewModel(o)).ToArray();
+            var result = await _queryDispatcher.DispatchAsync(new GetTranslationOptionsQuery());
+            Model.AvaliableTranslationOptions = result.Response.Result.Select(to => new TranslationOptionViewModel(to)).ToArray();
             Model.TranslationOptions = Model.AvaliableTranslationOptions;
         }
     }
 
-    private void OnKeywordSearch(Microsoft.AspNetCore.Components.ChangeEventArgs args) => OnSearch(args?.Value?.ToString(), Model.SelectedSearchTranslationType);
+    private void OnKeywordSearch(Microsoft.AspNetCore.Components.ChangeEventArgs args) => OnSearch(args?.Value?.ToString());
 
-    private void OnSearch(string keyword, TranslationType? translationType) 
+    private void OnSearch(string keyword) 
     {
         Model.TranslationOptions = Model.AvaliableTranslationOptions;
 
@@ -74,7 +76,7 @@
 
 
         Model.IsValid = Model.HasSelection;
-        OnSearch(Model.SearchKeyword, Model.SelectedSearchTranslationType);
+        OnSearch(Model.SearchKeyword);
     }
 
     protected override void OnInitialized()

@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using SIO.Domain.Extensions;
 using SIO.Front.Client.Extensions;
+using SIO.Infrastructure.Extensions;
+using SIO.Infrastructure.Serialization.MessagePack.Extensions;
 using System.Threading.Tasks;
 
 namespace SIO.Front.Client
@@ -12,9 +15,15 @@ namespace SIO.Front.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
+            builder.Services.AddSIOInfrastructure()
+                .AddCommands()
+                .DisableCommandLogging()
+                .AddQueries()
+                .DisableQueryLogging();
+
             builder.Services
                 .AddComponents()
-                .AddApi(builder.Configuration)
+                .AddDomain(builder.HostEnvironment)                
                 .AddAuthentication(builder.Configuration)
                 .AddApiAuthorization();
 

@@ -1,5 +1,5 @@
-﻿@using SIO.Api.Client.Client
-@using SIO.Front.Client.Pages.UploadDocument.ViewModels
+﻿@using SIO.Front.Client.Pages.UploadDocument.ViewModels
+@using SIO.Front.Client.Extensions
 @inject IWizardInteraction WizardState
 
 <WizardStep OnSubmitAsync="SubmitAsync" Model="Model">
@@ -22,7 +22,7 @@
                   </span>
                 </span>
                 <span class="file-name">
-                    @Model?.File?.Name
+                    @Model?.FileName
                 </span>
               </label>
             </div>
@@ -38,12 +38,12 @@
     public UploadFileModel Model { get; set; }
     
 
-    private void LoadFile(InputFileChangeEventArgs e)
+    private async Task LoadFile(InputFileChangeEventArgs e)
     {
-        Model.File = new(e.File.Name, e.File.OpenReadStream());
-
-        if (Model.File != null)
-            Model.IsValid = true;
+        Model.File = await e.File.OpenReadStream().ToArrayAsync();
+        Model.FileName = e.File.Name;
+        Model.FileContentType = e.File.ContentType;
+        Model.IsValid = true;
     }
 
     private async Task SubmitAsync()

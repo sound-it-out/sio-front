@@ -19,15 +19,15 @@
 
   <ItemGroup>
     <PackageReference Include="BuildWebCompiler" Version="1.12.394" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.7" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="5.0.7" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
     <PackageReference Include="JsonSubTypes" Version="1.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Polly" Version="7.2.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.7" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="5.0.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,9 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="SIO.Api.Client">
-      <HintPath>..\..\..\sio-api-client\src\SIO.Api.Client\bin\Debug\net5.0\SIO.Api.Client.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\SIO.Domain\SIO.Domain.csproj" />
   </ItemGroup>
 
 </Project>
