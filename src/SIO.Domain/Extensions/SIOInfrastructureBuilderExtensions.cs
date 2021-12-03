@@ -14,13 +14,13 @@ namespace SIO.Domain.Extensions
 {
     public static class SIOInfrastructureBuilderExtensions
     {
-        public static ISIOInfrastructureBuilder DisableCommandLogging(this ISIOInfrastructureBuilder builder)
+        public static ISIOInfrastructureBuilder DisableCommandStore(this ISIOInfrastructureBuilder builder)
         {
             builder.Services.AddSingleton<ICommandStore, NoOpCommandStore>();
             return builder;
         }
 
-        public static ISIOInfrastructureBuilder DisableQueryLogging(this ISIOInfrastructureBuilder builder)
+        public static ISIOInfrastructureBuilder DisableQueryStore(this ISIOInfrastructureBuilder builder)
         {
             builder.Services.AddSingleton<IQueryStore, NoOpQueryStore>();
             return builder;

@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SIO.Domain.Documents.Api.Requests;
+using SIO.Domain.Documents.Api.Responses;
 
 namespace SIO.Domain.Documents.Api
 {
@@ -15,14 +15,17 @@ namespace SIO.Domain.Documents.Api
         {
         }
 
+        public Task<ApiResponse<IEnumerable<UserDocumentResponse>>> GetAsync(CancellationToken cancellationToken = default)
+            => GetAsync<IEnumerable<UserDocumentResponse>>(cancellationToken: cancellationToken);
+
         public async Task<ApiResponse> UploadAsync(UploadRequest request, CancellationToken cancellationToken = default)
         {
             var content = new MultipartFormDataContent();
-            Console.WriteLine("Adding file");
             var fileContent = new ByteArrayContent(request.File);
+
             fileContent.Headers.ContentType = new MediaTypeHeaderValue(request.FileContentType);
+
             content.Add(fileContent, nameof(UploadRequest.File), request.FileName);
-            Console.WriteLine("File added");
             content.Add(new StringContent(request.TranslationType.ToString()), nameof(UploadRequest.TranslationType));
             content.Add(new StringContent(request.TranslationSubject), nameof(UploadRequest.TranslationSubject));
 
@@ -30,9 +33,8 @@ namespace SIO.Domain.Documents.Api
             {
                 Content = content
             };
-            message.Headers.Add("accept", "application/json");
 
-            Console.WriteLine("Requesting");
+            message.Headers.Add("accept", "application/json");
 
             return await ProcessResponse(await _httpClient.SendAsync(message));
         }

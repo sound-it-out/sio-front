@@ -8,8 +8,8 @@ services:
       - Identity__Authority=https://host.docker.internal:5001
       - Api__Url=https://sio.api:44363
     ports:
-      - "63328:80"
-      - "44348:443"
+      - "63329:80"
+      - "44349:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
