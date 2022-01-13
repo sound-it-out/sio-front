@@ -15,18 +15,18 @@
         <div class="navbar-start">
             <a href="/"
                aria-current="page"
-               class="
-                      navbar-item
-                      has-padding-vertical-4 has-padding-horizontal-5
-                    ">
+               class="navbar-item has-padding-vertical-4 has-padding-horizontal-5">
                 Documents
-            </a><a href="/library"
+            </a><NavLink href="upload"
+               class="navbar-item has-padding-vertical-4 has-padding-horizontal-5">
+                Upload
+            </NavLink><NavLink href="library"
                    class="navbar-item has-padding-vertical-4 has-padding-horizontal-5">
                 Library
-            </a><a href="/orders"
+            </NavLink><NavLink href="orders"
                    class="navbar-item has-padding-vertical-4 has-padding-horizontal-5">
                 Orders
-            </a>
+            </NavLink>
         </div>
         <div class="navbar-end">
             <div class="@UserDropdownClass" @onclick="ToggleUserDropdown">

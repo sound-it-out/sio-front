@@ -1,7 +1,80 @@
 ﻿@page "/"
-@using SIO.Front.Client.Pages.UploadDocument
+@implements IDisposable
+@using SIO.Domain.Documents.Api.Responses
+@using SIO.Domain.Documents.Queries
+@using SIO.Infrastructure
+@using SIO.Infrastructure.Queries
+@using SIO.Infrastructure.Commands
+@using SIO.IntegrationEvents.Documents
+@using SIO.Notifications.Manager
+@using SIO.Domain.Documents.Commands
+@using SIO.Notifications.Processor
+@inject IQueryDispatcher _queryDispatcher
+@inject ICommandDispatcher _commandDispatcher
+@inject INotificationManager _notificationManager
 
-<UploadDocumentWizard></UploadDocumentWizard>
+<LoadingScreen OnPageLoadAsync="OnPageLoadAsync">
+    <div class="columns is-multiline">
+        <div class="column is-full is-flex is-justify-content-end">
+            <button class="button is-primary">Upload new file</button>
+        </div>
+        @foreach(var document in _userDocuments)
+        {
+            <div class="column is-full">
+                    <div class="card">
+                      <div class="card-content">
+                        <div class="media">
+                          <div class="media-left">
+                          </div>
+                          <div class="media-content">
+                            <p class="title is-4">@document.FileName</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+        }
+    </div>
+</LoadingScreen>
 
 @code {
+    private IEnumerable<UserDocumentResponse> _userDocuments = Enumerable.Empty<UserDocumentResponse>();
+    private Subject _subscription;
+    private bool _hasLoaded;
+
+    private async Task OnPageLoadAsync() => await LoadDocumentsAsync();    
+
+    private async Task LoadDocumentsAsync()
+    {
+        Console.WriteLine($"Has loaded? {_hasLoaded}");
+        if(!_hasLoaded)
+            await _commandDispatcher.DispatchAsync(new LoadUserDocumentsStateCommand());
+
+        _hasLoaded = true;
+        try
+        {
+             var result = await _queryDispatcher.DispatchAsync(new GetDocumentsQuery());
+            _userDocuments = result.UserDocuments;   
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _subscription = _notificationManager.Subscribe(sub => sub
+            .With<DocumentUploaded>(async (_, _) =>
+            {
+                Console.WriteLine("Loading documents from notification");
+                await LoadDocumentsAsync();
+                Console.WriteLine(_userDocuments.Count());
+                StateHasChanged();
+            })
+            .For<DocumentUploaded>()
+        );
+    }
+
+    void IDisposable.Dispose() => _notificationManager.UnSubscribe(_subscription);
 }

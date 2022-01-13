@@ -4,7 +4,7 @@ using SIO.Infrastructure.Queries;
 
 namespace SIO.Domain.TranslationOptions.Queries
 {
-    public class GetTranslationOptionsQueryResult : IQueryResult
+    public sealed class GetTranslationOptionsQueryResult : IQueryResult
     {
         public ApiResponse<IEnumerable<TranslationOptionResponse>> Response {  get; }
 

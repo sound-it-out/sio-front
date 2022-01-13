@@ -5,11 +5,17 @@ using Microsoft.Extensions.Options;
 using SIO.Domain.Documents.Api;
 using SIO.Domain.Documents.CommandHandlers;
 using SIO.Domain.Documents.Commands;
+using SIO.Domain.Documents.EventHandlers;
+using SIO.Domain.Documents.Queries;
+using SIO.Domain.Documents.QueryHandlers;
+using SIO.Domain.Documents.States;
 using SIO.Domain.TranslationOptions.Api;
 using SIO.Domain.TranslationOptions.Queries;
 using SIO.Domain.TranslationOptions.QueryHandlers;
 using SIO.Infrastructure.Commands;
+using SIO.Infrastructure.Events;
 using SIO.Infrastructure.Queries;
+using SIO.IntegrationEvents.Documents;
 
 namespace SIO.Domain.Extensions
 {
@@ -37,9 +43,16 @@ namespace SIO.Domain.Extensions
         private static IServiceCollection AddDocuments(this IServiceCollection services)
         {
             //Queries
+            services.AddScoped<IQueryHandler<GetDocumentsQuery, GetDocumentsQueryResult>, GetDocumentsQueryHandler>();
+            //Commands
             services.AddScoped<ICommandHandler<UploadDocumentCommand>, UploadDocumentCommandHandler>();
+            services.AddScoped<ICommandHandler<LoadUserDocumentsStateCommand>, LoadUserDocumentsStateCommandHandler>();
+            //Event handlers
+            services.AddScoped<IEventHandler<DocumentUploaded>, DocumentUploadedEventHandler>();
             //Apis
             services.AddApi<IDocumentApi, DocumentApi>();
+            //States
+            services.AddSingleton<IUserDocumentsState, UserDocumentsState>();
 
             return services;
         }

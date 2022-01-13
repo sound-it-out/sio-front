@@ -1,4 +1,8 @@
-﻿<CascadingAuthenticationState>
+﻿@implements IAsyncDisposable
+@using Microsoft.Extensions.DependencyInjection;
+@inject Notifications.Processor.INotificationProcessor _notificationProcessor;
+<LoadingScreen OnPageLoadAsync="StartNotificationsAsync">
+    <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
@@ -24,3 +28,9 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+</LoadingScreen>
+
+@code {
+    protected Task StartNotificationsAsync() => _notificationProcessor.StartAsync();
+    public async ValueTask DisposeAsync() => await _notificationProcessor.StopAsync();
+}

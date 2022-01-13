@@ -5,7 +5,7 @@ using SIO.Infrastructure.Commands;
 
 namespace SIO.Domain.Documents.Commands
 {
-    public class UploadDocumentCommand : Command
+    public sealed class UploadDocumentCommand : Command
     {
         public byte[] File { get; }
         public string FileName { get; }

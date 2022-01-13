@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SIO.Domain.Extensions;
 using SIO.Front.Client.Extensions;
 using SIO.Infrastructure.Extensions;
 using SIO.Infrastructure.Serialization.MessagePack.Extensions;
-using System.Threading.Tasks;
+using SIO.IntegrationEvents.Documents;
+using SIO.Notifications.Extensions;
 
 namespace SIO.Front.Client
 {
@@ -16,7 +18,7 @@ namespace SIO.Front.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
             if(builder.HostEnvironment.IsDevelopment())
-                builder.Logging.SetMinimumLevel(LogLevel.Debug);
+                builder.Logging.SetMinimumLevel(LogLevel.Trace);
             else
                 builder.Logging.SetMinimumLevel(LogLevel.Critical);
 
@@ -24,11 +26,13 @@ namespace SIO.Front.Client
                 .AddCommands()
                 .DisableCommandStore()
                 .AddQueries()
-                .DisableQueryStore();
+                .DisableQueryStore()
+                .AddEvents(o => o.Register<DocumentUploaded>());
 
             builder.Services
                 .AddComponents()
-                .AddDomain(builder.HostEnvironment)                
+                .AddDomain(builder.HostEnvironment)
+                .AddNotifications(o => o.WithUrl("https://localhost:44316/notifications").ForEvent<DocumentUploaded>())
                 .AddAuthentication(builder.Configuration)
                 .AddLogging()
                 .AddApiAuthorization();
