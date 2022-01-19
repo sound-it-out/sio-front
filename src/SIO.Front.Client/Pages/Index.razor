@@ -28,6 +28,7 @@
                           </div>
                           <div class="media-content">
                             <p class="title is-4">@document.FileName</p>
+                            <button class="btn is-primary" @onclick="() => DownloadDocumentsAsync(document.Id)">Download</button>
                           </div>
                         </div>
                       </div>
@@ -46,30 +47,24 @@
 
     private async Task LoadDocumentsAsync()
     {
-        Console.WriteLine($"Has loaded? {_hasLoaded}");
         if(!_hasLoaded)
             await _commandDispatcher.DispatchAsync(new LoadUserDocumentsStateCommand());
 
         _hasLoaded = true;
-        try
-        {
-             var result = await _queryDispatcher.DispatchAsync(new GetDocumentsQuery());
-            _userDocuments = result.UserDocuments;   
-        }
-        catch(Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
+
+        var result = await _queryDispatcher.DispatchAsync(new GetDocumentsQuery());
+        _userDocuments = result.UserDocuments;
     }
 
-    protected override async Task OnInitializedAsync()
+    private async Task DownloadDocumentsAsync(string subject)
+        => await _commandDispatcher.DispatchAsync(new DownloadDocumentCommand(subject));
+
+    protected override void OnInitialized()
     {
         _subscription = _notificationManager.Subscribe(sub => sub
             .With<DocumentUploaded>(async (_, _) =>
             {
-                Console.WriteLine("Loading documents from notification");
                 await LoadDocumentsAsync();
-                Console.WriteLine(_userDocuments.Count());
                 StateHasChanged();
             })
             .For<DocumentUploaded>()

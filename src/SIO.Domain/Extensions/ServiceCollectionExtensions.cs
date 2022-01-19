@@ -3,12 +3,17 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SIO.Domain.Documents.Api;
+using SIO.Domain.Documents.Commandhandlers;
 using SIO.Domain.Documents.CommandHandlers;
 using SIO.Domain.Documents.Commands;
 using SIO.Domain.Documents.EventHandlers;
 using SIO.Domain.Documents.Queries;
 using SIO.Domain.Documents.QueryHandlers;
 using SIO.Domain.Documents.States;
+using SIO.Domain.JSRuntime.CommandHandlers;
+using SIO.Domain.JSRuntime.Commands;
+using SIO.Domain.JSRuntime.Queries;
+using SIO.Domain.JSRuntime.QueryHandlers;
 using SIO.Domain.TranslationOptions.Api;
 using SIO.Domain.TranslationOptions.Queries;
 using SIO.Domain.TranslationOptions.QueryHandlers;
@@ -25,7 +30,8 @@ namespace SIO.Domain.Extensions
         {
             services.ConfigureApis(environment)
                 .AddDocuments()
-                .AddTranslationOptions();
+                .AddTranslationOptions()
+                .AddJsRUntime();
 
             return services;
         }
@@ -47,12 +53,24 @@ namespace SIO.Domain.Extensions
             //Commands
             services.AddScoped<ICommandHandler<UploadDocumentCommand>, UploadDocumentCommandHandler>();
             services.AddScoped<ICommandHandler<LoadUserDocumentsStateCommand>, LoadUserDocumentsStateCommandHandler>();
+            services.AddScoped<ICommandHandler<DownloadDocumentCommand>, DownloadDocumentCommandHandler>();
             //Event handlers
             services.AddScoped<IEventHandler<DocumentUploaded>, DocumentUploadedEventHandler>();
             //Apis
             services.AddApi<IDocumentApi, DocumentApi>();
             //States
             services.AddSingleton<IUserDocumentsState, UserDocumentsState>();
+
+            return services;
+        }
+
+        private static IServiceCollection AddJsRUntime(this IServiceCollection services)
+        {
+            //Queries
+            services.AddScoped<IQueryHandler<GetJsFileQuery, GetJsFileQueryResult>, GetJsFileQueryHandler>();
+
+            //Commands
+            services.AddScoped<ICommandHandler<DownloadFileCommand>, DownloadFileCommandHandler>();            
 
             return services;
         }

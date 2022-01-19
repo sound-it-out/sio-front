@@ -15,6 +15,9 @@ namespace SIO.Domain.Documents.Api
         {
         }
 
+        public Task<ApiResponse<FileResponse>> DownloadAsync(string subject, CancellationToken cancellationToken = default)
+            => DownloadFileAsync($"download/{subject}", cancellationToken: cancellationToken);
+
         public Task<ApiResponse<IEnumerable<UserDocumentResponse>>> GetAsync(CancellationToken cancellationToken = default)
             => GetAsync<IEnumerable<UserDocumentResponse>>(cancellationToken: cancellationToken);
 

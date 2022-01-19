@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -36,6 +37,8 @@ namespace SIO.Domain
 
         protected async Task<ApiResponse<T>> GetAsync<T>(string requestUri = null, CancellationToken cancellationToken = default) 
             => await ProcessResponse<T>(await _httpClient.GetAsync(requestUri, cancellationToken));
+        protected async Task<ApiResponse<FileResponse>> DownloadFileAsync(string requestUri = null, CancellationToken cancellationToken = default)
+            => await ProcessFileResponse(await _httpClient.GetAsync(requestUri, cancellationToken));
         protected async Task<ApiResponse> DeleteAsync(string requestUri = null, CancellationToken cancellationToken = default) 
             => await ProcessResponse(await _httpClient.DeleteAsync(requestUri, cancellationToken));
         protected async Task<ApiResponse> PostAsync<T>(string requestUri = null, T data = default, CancellationToken cancellationToken = default)
@@ -56,6 +59,19 @@ namespace SIO.Domain
                 return ApiResponse<T>.Fail(content, response.StatusCode);
 
             return ApiResponse<T>.Success(JsonConvert.DeserializeObject<T>(content));
+        }
+
+        protected async Task<ApiResponse<FileResponse>> ProcessFileResponse(HttpResponseMessage response)
+        {
+            if (response == null)
+                return ApiResponse<FileResponse>.Fail("Unable to make request");
+
+            var stream = await response.Content.ReadAsStreamAsync();
+
+            if (!_validStatusCodes.Contains(response.StatusCode))
+                return ApiResponse<FileResponse>.Fail("", response.StatusCode);
+
+            return ApiResponse<FileResponse>.Success(new FileResponse(stream, response.Content.Headers.ContentDisposition?.FileName));
         }
 
         protected async Task<ApiResponse> ProcessResponse(HttpResponseMessage response)
