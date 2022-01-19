@@ -1,0 +1,69 @@
+﻿@inject IWizardInteraction WizardInteraction
+
+
+@if (Parent?.ActiveStep?.Id == Id)
+{
+    if(loading)
+    {
+        <Loader IsInline="true" />
+    }
+    else
+    {
+        @ChildContent   
+    }
+    <div class="columns">
+        <div class="column is-flex is-justify-content-left">
+                <button class="button is-secondary" type="button" 
+                    disabled="@(Parent.ActiveStepIx == 0)" @onclick="WizardInteraction.PreviousStepAsync">Previous</button>
+        </div>
+        <div class="column is-flex is-justify-content-right">
+            <button class="button is-primary" 
+                    disabled=@(!Model.IsValid)
+                    type="@(Parent.IsLastStep ? "submit" : "button")" @onclick="WizardInteraction.NextStepAsync">@(Parent.IsLastStep ? "Submit" : "Next")</button>
+         </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    protected internal Wizard Parent { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public Func<Task> OnSubmitAsync { get; set; }
+    [Parameter]
+    public Func<Task> OnActivationAsync { get; set; }    
+    [Parameter]
+    public IWizardStepViewModel Model { get; set; }
+
+    public Guid Id { get; set; } = Guid.NewGuid();
+
+    private bool loading;
+
+    public async Task SubmitAsync()
+    {
+        loading = true;
+        StateHasChanged();
+        if (OnSubmitAsync != null)
+            await OnSubmitAsync();
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    public async Task ActivateAsync()
+    {
+        loading = true;
+        StateHasChanged();
+        if (OnActivationAsync != null)
+            await OnActivationAsync();
+
+        loading = false;
+        StateHasChanged();
+    }
+      
+    sealed protected override void OnInitialized()
+    {
+        Parent.AddStep(this);
+    }
+}

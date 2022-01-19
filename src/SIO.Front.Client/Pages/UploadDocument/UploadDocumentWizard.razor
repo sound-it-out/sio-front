@@ -1,0 +1,27 @@
+﻿@using SIO.Domain.Documents.Commands
+@using SIO.Front.Client.Pages.UploadDocument.Steps;
+@using SIO.Front.Client.Pages.UploadDocument.ViewModels
+@using SIO.Infrastructure.Commands
+@inject NavigationManager NavigationManager
+@inject ICommandDispatcher _commandDispatcher
+
+<Wizard>
+    <UploadFile OnCompletionAsync="UpdateUploadFileModelAsync"></UploadFile>
+    <SelectTranslationType OnCompletionAsync="UpdateSelectTranslationModelAsync"></SelectTranslationType>
+</Wizard>
+
+@code {
+    private UploadFileModel _uploadFileModel;
+
+    private Task UpdateUploadFileModelAsync(UploadFileModel model)
+    {
+        _uploadFileModel = model;
+        return Task.CompletedTask;
+    }
+
+    private async Task UpdateSelectTranslationModelAsync(SelectTranslationModel model)
+    {
+        await _commandDispatcher.DispatchAsync(new UploadDocumentCommand(_uploadFileModel.File, _uploadFileModel.FileName, _uploadFileModel.FileContentType, model.SelectedTranslation));
+        NavigationManager.NavigateTo("/");
+    }
+}

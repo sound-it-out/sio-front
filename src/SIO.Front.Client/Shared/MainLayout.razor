@@ -1,13 +1,29 @@
 @inherits LayoutComponentBase
+
+@inject NavigationManager navigationManager
+
 <div>
     <NavMenu />
     <div class="columns">
         <div class="column has-padding-4">
-            <div class="box">
-                <main role="main">
-                    @Body
-                </main>
-            </div>
+            <main role="main">
+                @Body
+            </main>
         </div>
     </div>
 </div>
+
+@code{ 
+
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthStat { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var user = (await AuthStat).User;
+
+        if (!user.Identity.IsAuthenticated)
+            navigationManager.NavigateTo("authentication/login");
+    }
+}

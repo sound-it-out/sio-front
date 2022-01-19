@@ -1,3 +1,21 @@
-﻿<div class="loader-wrapper">
-    <div class="loader is-loading"></div>
+﻿<div class="sio-loader">
+    @if (IsInline == true)
+    {
+        <div class="columns">
+            <div class="column inline">
+                <div class="loader is-loading"></div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="loader-wrapper">
+            <div class="loader is-loading"></div>
+        </div>
+    }
 </div>
+
+@code{
+    [Parameter]
+    public bool? IsInline { get; set; }
+}

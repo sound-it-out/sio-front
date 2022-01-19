@@ -1,24 +1,33 @@
-.loader-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: #fff;
-    transition: opacity .3s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 6px;
+.sio-loader {
+    .loader-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: #fff;
+        transition: opacity .3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 6px;
 
-        .loader {
-            height: 80px;
-            width: 80px;
-            border-left-color: $primary;
+        &.is-active {
+            opacity: 1;
+            z-index: 1;
         }
+    }
 
-    &.is-active {
-        opacity: 1;
-        z-index: 1;
+    .loader {
+        height: 80px;
+        width: 80px;
+        border-left-color: $primary;
+    }
+
+    .inline {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 6px;
     }
 }

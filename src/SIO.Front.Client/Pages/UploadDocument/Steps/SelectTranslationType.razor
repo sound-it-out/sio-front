@@ -1,0 +1,92 @@
+﻿@using Newtonsoft.Json
+@using SIO.Domain.TranslationOptions.Api.Responses
+@using SIO.Domain.TranslationOptions.Queries
+@using SIO.Front.Client.Pages.UploadDocument.ViewModels
+@using SIO.Infrastructure.Queries
+@inject IQueryDispatcher _queryDispatcher
+
+<WizardStep OnActivationAsync="GetTranslationsAsync" OnSubmitAsync="SubmitAsync" Model="Model">
+    @if(Model.TranslationOptions != null)
+    {
+        <div class="columns">
+            <div class="column">
+                <EditForm Model="Model">
+                    <div class="field">
+                      <p class="control is-expanded">
+                        <InputText @bind-Value="Model.SearchKeyword" class="input" @oninput="OnKeywordSearch"></InputText>
+                      </p>
+                    </div>
+                   
+                </EditForm>
+            </div>
+        </div>
+        <div class="columns is-multiline translation-options">
+            @foreach(var option in Model.TranslationOptions)
+            {
+                <div class="column is-one-third">
+                    <div class="card @(option.Selected ? "has-background-primary" : "")" @onclick="() => SelectOption(option)">
+                      <div class="card-content">
+                        <div class="media">
+                          <div class="media-left">
+                          </div>
+                          <div class="media-content">
+                            <p class="title is-4 @(option.Selected ? "has-text-white" : "")">@option.Subject</p>
+                            <p class="subtitle is-6 @(option.Selected ? "has-text-white" : "")">@option.TranslationTypeName</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            }   
+        </div>        
+    }    
+</WizardStep>
+
+@code {
+    [Parameter]
+    public Func<SelectTranslationModel, Task> OnCompletionAsync { get; set; }
+    public SelectTranslationModel Model { get; set; }
+    private async Task GetTranslationsAsync()
+    {
+        if(Model.AvaliableTranslationOptions == null)
+        {
+            var result = await _queryDispatcher.DispatchAsync(new GetTranslationOptionsQuery());
+            Model.AvaliableTranslationOptions = result.Response.Result.Select(to => new TranslationOptionViewModel(to)).ToArray();
+            Model.TranslationOptions = Model.AvaliableTranslationOptions;
+        }
+    }
+
+    private void OnKeywordSearch(Microsoft.AspNetCore.Components.ChangeEventArgs args) => OnSearch(args?.Value?.ToString());
+
+    private void OnSearch(string keyword) 
+    {
+        Model.TranslationOptions = Model.AvaliableTranslationOptions;
+
+        if(!string.IsNullOrWhiteSpace(keyword))
+            Model.TranslationOptions = Model.TranslationOptions.Where(o => o.Subject.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+    } 
+
+    private void SelectOption(TranslationOptionViewModel o)
+    {
+        for (var i = 0; i < Model.AvaliableTranslationOptions.Count(); i++)
+            if(Model.AvaliableTranslationOptions[i].Subject == o.Subject && Model.AvaliableTranslationOptions[i].TranslationType == o.TranslationType)
+                Model.AvaliableTranslationOptions[i].Selected = !Model.AvaliableTranslationOptions[i].Selected;
+            else
+                Model.AvaliableTranslationOptions[i].Selected = false;
+
+
+        Model.IsValid = Model.HasSelection;
+        OnSearch(Model.SearchKeyword);
+    }
+
+    protected override void OnInitialized()
+    {
+        Model ??= new SelectTranslationModel();
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (OnCompletionAsync != null)
+            await OnCompletionAsync(Model);
+    }
+}

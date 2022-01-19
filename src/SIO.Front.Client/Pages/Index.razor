@@ -1,7 +1,75 @@
 ﻿@page "/"
+@implements IDisposable
+@using SIO.Domain.Documents.Api.Responses
+@using SIO.Domain.Documents.Queries
+@using SIO.Infrastructure
+@using SIO.Infrastructure.Queries
+@using SIO.Infrastructure.Commands
+@using SIO.IntegrationEvents.Documents
+@using SIO.Notifications.Manager
+@using SIO.Domain.Documents.Commands
+@using SIO.Notifications.Processor
+@inject IQueryDispatcher _queryDispatcher
+@inject ICommandDispatcher _commandDispatcher
+@inject INotificationManager _notificationManager
 
-<h1>Hello, world!</h1>
+<LoadingScreen OnPageLoadAsync="OnPageLoadAsync">
+    <div class="columns is-multiline">
+        <div class="column is-full is-flex is-justify-content-end">
+            <button class="button is-primary">Upload new file</button>
+        </div>
+        @foreach(var document in _userDocuments)
+        {
+            <div class="column is-full">
+                    <div class="card">
+                      <div class="card-content">
+                        <div class="media">
+                          <div class="media-left">
+                          </div>
+                          <div class="media-content">
+                            <p class="title is-4">@document.FileName</p>
+                            <button class="btn is-primary" @onclick="() => DownloadDocumentsAsync(document.Id)">Download</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+        }
+    </div>
+</LoadingScreen>
 
-Welcome to your new app.
+@code {
+    private IEnumerable<UserDocumentResponse> _userDocuments = Enumerable.Empty<UserDocumentResponse>();
+    private Subject _subscription;
+    private bool _hasLoaded;
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    private async Task OnPageLoadAsync() => await LoadDocumentsAsync();    
+
+    private async Task LoadDocumentsAsync()
+    {
+        if(!_hasLoaded)
+            await _commandDispatcher.DispatchAsync(new LoadUserDocumentsStateCommand());
+
+        _hasLoaded = true;
+
+        var result = await _queryDispatcher.DispatchAsync(new GetDocumentsQuery());
+        _userDocuments = result.UserDocuments;
+    }
+
+    private async Task DownloadDocumentsAsync(string subject)
+        => await _commandDispatcher.DispatchAsync(new DownloadDocumentCommand(subject));
+
+    protected override void OnInitialized()
+    {
+        _subscription = _notificationManager.Subscribe(sub => sub
+            .With<DocumentUploaded>(async (_, _) =>
+            {
+                await LoadDocumentsAsync();
+                StateHasChanged();
+            })
+            .For<DocumentUploaded>()
+        );
+    }
+
+    void IDisposable.Dispose() => _notificationManager.UnSubscribe(_subscription);
+}

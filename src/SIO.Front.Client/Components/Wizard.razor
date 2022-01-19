@@ -1,0 +1,155 @@
+﻿@inject IWizardInteraction WizardInteraction
+
+<CascadingValue Value="this">
+    <div class="columns">
+        <div class="column is-one-fifth"></div>
+        <div class="column is-centered">
+            <div class="box">
+                <ul class="steps is-medium is-centered has-content-centered">
+                    @foreach (var step in _steps)
+                    {
+                        <li class="steps-segment @((step.Id == ActiveStep.Id) ? "is-active" : "")">
+                            <span class="steps-marker" @onclick="@(_ => SetActiveAsync(step))">
+                                <span class="icon">
+                                  <i class="fa @step?.Model.Icon"></i>
+                                </span>
+                              </span>
+                              <div class="steps-content">
+                                <p class="heading">@step?.Model?.Name</p>
+                              </div>
+                          </li>
+                    }
+                </ul>
+                @ChildContent
+            </div>
+        </div>
+        <div class="column is-one-fifth"></div>
+    </div>
+</CascadingValue>
+
+@code {
+    /// <summary>
+    /// List of <see cref="WizardStep"/> added to the Wizard
+    /// </summary>
+    protected internal readonly List<WizardStep> _steps = new List<WizardStep>();
+
+    /// <summary>
+    /// The control Id
+    /// </summary>
+    [Parameter]
+    public string Id { get; set; }
+
+    /// <summary>
+    /// The ChildContent container for <see cref="WizardStep"/>
+    /// </summary>
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    /// <summary>
+    /// The Active <see cref="WizardStep"/>
+    /// </summary>
+    [Parameter]
+    public WizardStep ActiveStep { get; set; }
+
+    /// <summary>
+    /// The Index number of the <see cref="ActiveStep"/>
+    /// </summary>
+    [Parameter]
+    public int ActiveStepIx { get; set; }
+
+    /// <summary>
+    /// Determines whether the Wizard is in the last step
+    /// </summary>
+
+    public bool IsLastStep { get; set; }
+
+    /// <summary>
+    /// Sets the <see cref="ActiveStep"/> to the previous Index
+    /// </summary>
+
+    protected internal async Task GoBackAsync()
+    {
+        if (ActiveStepIx > 0)
+        {
+            await SetActiveAsync(_steps[ActiveStepIx - 1]);
+        }        
+    }
+
+    /// <summary>
+    /// Sets the <see cref="ActiveStep"/> to the next Index
+    /// </summary>
+    protected internal async Task GoNextAsync()
+    {
+        if (ActiveStep != null && !ActiveStep.Model.IsValid)
+            return;
+
+        if(ActiveStep != null)
+            await ActiveStep.SubmitAsync();        
+
+        if (ActiveStepIx < _steps.Count - 1)
+            await SetActiveAsync(_steps[(_steps.IndexOf(ActiveStep) + 1)]);
+    }
+
+    /// <summary>
+    /// Populates the <see cref="ActiveStep"/> the Sets the passed in <see cref="WizardStep"/> instance as the
+    /// </summary>
+    /// <param name="step">The WizardStep</param>
+
+    protected internal async Task SetActiveAsync(WizardStep step)
+    {
+        if (step == null)
+            throw new ArgumentNullException(nameof(step));
+
+        ActiveStep = step;
+
+        ActiveStepIx = StepsIndex(step);
+        if (ActiveStepIx == _steps.Count - 1)
+            IsLastStep = true;
+        else
+            IsLastStep = false;
+
+        StateHasChanged();
+
+        await ActiveStep.ActivateAsync();
+    }
+
+    /// <summary>
+    /// Retrieves the index of the current <see cref="WizardStep"/> in the Step List
+    /// </summary>
+    /// <param name="step">The WizardStep</param>
+    /// <returns></returns>
+    public int StepsIndex(WizardStep step) => StepsIndexInternal(step);
+    protected int StepsIndexInternal(WizardStep step)
+    {
+        if (step == null)
+            throw new ArgumentNullException(nameof(step));
+
+        return _steps.IndexOf(step);
+    }
+    /// <summary>
+    /// Adds a <see cref="WizardStep"/> to the WizardSteps list
+    /// </summary>
+    /// <param name="step"></param>
+    protected internal void AddStep(WizardStep step)
+    {
+        _steps.Add(step);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SetActiveAsync(_steps[0]);
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        WizardInteraction.RegisterChange(StateHasChanged);
+        WizardInteraction.RegisterOnPreviousStepAsync(GoBackAsync);
+        WizardInteraction.RegisterOnNextStepAsync(GoNextAsync);
+
+        base.OnInitialized();
+    }
+}
