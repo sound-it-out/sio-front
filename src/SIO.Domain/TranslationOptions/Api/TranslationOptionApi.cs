@@ -9,11 +9,11 @@ namespace SIO.Domain.TranslationOptions.Api
 {
     internal sealed class TranslationOptionApi : ApiBase, ITranslationOptionApi
     {
-        public TranslationOptionApi(HttpClient httpClient, IOptions<ApiOptions> options) : base(httpClient, options, "translationoption")
+        public TranslationOptionApi(HttpClient httpClient, IOptions<ApiOptions> options) : base(httpClient, options, "translation")
         {
         }
 
         public Task<ApiResponse<IEnumerable<TranslationOptionResponse>>> GetTranslationOptionsAsync(CancellationToken cancellationToken = default) 
-            => GetAsync<IEnumerable<TranslationOptionResponse>>(cancellationToken: cancellationToken);
+            => GetAsync<IEnumerable<TranslationOptionResponse>>("options", cancellationToken: cancellationToken);
     }
 }

@@ -78,7 +78,7 @@ namespace SIO.Domain.Extensions
         private static IServiceCollection ConfigureApis(this IServiceCollection services, IWebAssemblyHostEnvironment environment)
         {
             if (environment.IsDevelopment())
-                services.Configure<ApiOptions>(o => o.BaseUrl = "https://localhost:44363/v1");
+                services.Configure<ApiOptions>(o => o.BaseUrl = "https://localhost:44380/v1");
 
             return services;
         }
